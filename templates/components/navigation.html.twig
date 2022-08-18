@@ -1,0 +1,7 @@
+<div class="navigation">
+	{% if app.user is null %}
+		{% include "components/user/sign.html.twig" %}
+	{% else %}
+		{% include "components/user/profile.html.twig" %}
+	{% endif %}
+</div>
