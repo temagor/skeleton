@@ -10,3 +10,13 @@ import './styles/app.scss';
 
 // start the Stimulus application
 import './bootstrap';
+
+import { createApp } from 'vue';
+import SingIn from './components/signIn.vue';
+import SingUp from './components/signUp.vue';
+
+const sign = createApp()
+sign
+    .component('signin', SingIn)
+    .component('signup', SingUp)
+    .mount('#sign')
