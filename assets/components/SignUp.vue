@@ -18,21 +18,21 @@
         {{ message }}
       </div>
       <form action="#" method="post" @submit.prevent="register">
+        <div v-if="errors.login">{{ errors.login }}</div>
         <input v-model="user.login" type="text" placeholder="Enter login" />
-        <input
-          v-model="user.needPasswordProtection"
-          type="checkbox"
-          id="switch"
-        /><label for="switch">Toggle</label>
+        <input v-model="user.protected" type="checkbox" id="switch" /><label
+          for="switch"
+          >Toggle</label
+        >
         <Transition name="slide-fade">
-          <div v-if="user.needPasswordProtection">
+          <div v-if="user.protected">
             <input
-              v-model="user.password"
+              v-model="credentialList.login.plainPassword"
               type="password"
               placeholder="Enter password"
             />
             <input
-              v-model="user.confirmPassword"
+              v-model="confirmPassword"
               type="password"
               placeholder="Confirm password"
             />
@@ -56,11 +56,16 @@ export default {
       success: false,
       errors: {},
       isVisible: false,
+      confirmPassword: "!@ChangeMe!",
       user: {
         login: "",
-        needPasswordProtection: false,
-        password: "!@ChangeMe!",
-        confirmPassword: "!@ChangeMe!",
+        protected: false,
+      },
+      credentialList: {
+        login: {
+          type: "login",
+          plainPassword: "!@ChangeMe!",
+        },
       },
     };
   },
@@ -69,15 +74,47 @@ export default {
       this.isVisible = !this.isVisible;
     },
     register() {
-      axios.post("/user/actions/api/sign-up", this.user).then((response) => {
-        this.success = response.data.success;
-        this.message = response.data.message;
-        if (response.data.success) {
-          setTimeout(() => {
-            window.location.reload();
-          }, 1500);
-        }
-      });
+      axios
+        .post("/user/actions/api/sign-up", {
+          user: this.user,
+          credentialList: this.credentialList,
+        })
+        .then((response) => {
+          this.success = response.data.success;
+          this.message = response.data.message;
+          if (response.data.success) {
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+          }
+        })
+        .catch((error) => {
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            if (error.response.status < 500) {
+              this.success = error.response.data.success;
+              this.message = error.response.data.message;
+              this.errors = error.response.data.errors;
+            } else {
+              this.success = error.response.data.success;
+              this.message = "server error";
+              this.errors = {};
+            }
+          } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            this.success = error.response.data.success;
+            this.message = "WoW! Server not available";
+            this.errors = {};
+            console.log(error.request);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log("Error", error.message);
+          }
+          console.log(error.config);
+        });
     },
   },
 };
