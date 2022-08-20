@@ -2,6 +2,15 @@
   box-shadow: 1px 0 10px 15px rgba(0, 0, 0, 0.3);
   padding: 40px;
   background-color: #fff;
+  &__message {
+    font-size: large;
+    &_success {
+      color: green;
+    }
+    &_error {
+      color: red;
+    }
+  }
 
   input {
     width: 100%;
