@@ -7,16 +7,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Actions\User\StoreAction as UserStoreAction;
 
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    protected array $fillable = ['login', 'protected'];
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -32,13 +31,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = [];
 
-    #[Assert\Count(min: 1, minMessage: 'at least one credential is needed')]
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Credential::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $credentials;
 
     public function __construct()
     {
         $this->credentials = new ArrayCollection();
+    }
+
+    #[ORM\PrePersist]
+    public function exceptions(): void
+    {
+        $isCorrectMethodSaving = false;
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        foreach ($backtrace as $trace) {
+            if (stripos($trace['file'], 'StoreAction')) {
+                $isCorrectMethodSaving = true;
+                break;
+            }
+        }
+        if (!$isCorrectMethodSaving) {
+            throw new Exception("use " . UserStoreAction::class . ' to create user!');
+        }
     }
 
     public function getId(): ?int
@@ -132,29 +146,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         $this->plainPassword = null;
-    }
-
-    public function fill(Request|array $userFillableData): void
-    {
-        match (get_class($userFillableData)) {
-            Request::class => $this->fillFromRequest($userFillableData),
-            default => $this->fillFromArray($userFillableData),
-        };
-    }
-
-    private function fillFromRequest(Request $request): void
-    {
-        $userFields = $request->get('user');
-        foreach ($this->fillable as $field) {
-            $this->$field = $userFields[$field];
-        }
-    }
-
-    private function fillFromArray(array $array): void
-    {
-        foreach ($this->fillable as $field) {
-            $this->$field = $array[$field];
-        }
     }
 
     /**

@@ -3,57 +3,48 @@
 namespace App\Actions\User;
 
 use App\Actions\AbstractAction;
-use App\Contracts\ActionContract;
-use App\Entity\Credential;
 use App\Entity\User;
-use App\Exception\Validate\UserException;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\Adapter\Request\RequestCredentialListAdapter;
+use App\Adapter\Request\RequestUserAdapter;
+use App\Entity\Credential;
+use App\Actions\User\StoreAction as UserStoreAction;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use App\Exception\Validate\UserException;
 
-class SignUpAction extends AbstractAction implements ActionContract
+class SignUpAction extends AbstractAction
 {
-    private User $user;
+    protected User $user;
+    /** @var Credential[] $credentialList */
+    protected array $credentialList;
+    protected Request $request;
 
     function __construct(
-        protected RequestStack $requestStack,
-        protected UserPasswordHasherInterface $userPasswordHasher,
-        protected ValidatorInterface $validator,
-        protected EntityManagerInterface $entityManager,
+        protected RequestUserAdapter $requestUserAdapter,
+        protected RequestCredentialListAdapter $requestCredentialListAdapter,
+        protected UserStoreAction $userStoreAction
     ) {
-        $request = $requestStack->getCurrentRequest();
-        $this->user = new User;
-        $this->user->fill($request);
-        $this->fillUserCredential($request);
-        /** @var ConstraintViolationListInterface $errors */
-        if (($errors = $validator->validate($this->user))->count() !== 0) {
-            throw new UserException($errors, Response::HTTP_BAD_REQUEST);
+        $this->user = $requestUserAdapter->getUser();
+        if (!$requestCredentialListAdapter->hasUser()) {
+            $requestCredentialListAdapter->setUser($this->user);
         }
+        $this->credentialList = $requestCredentialListAdapter->getCredentialList();
     }
 
-    private function fillUserCredential(Request $request)
+    /**
+     * @return void 
+     * @throws UserNotFoundException 
+     * @throws UserException 
+     */
+    public function handle(): void
     {
-        $credentialList = $request->get('credentialList');
-        foreach ($credentialList as $credentialFields) {
-            $credential = new Credential();
-            $credential->setType($credentialFields['type']);
-            if ($credential->getType() === 'login') {
-                $credential->setValue($this->userPasswordHasher->hashPassword($this->user, $credentialFields['plainPassword']));
-            }
-            if (($errors = $this->validator->validate($credential))->count() !== 0) {
-                throw new UserException($errors, Response::HTTP_BAD_REQUEST);
-            }
+        foreach ($this->credentialList as $credential) {
             $this->user->addCredential($credential);
         }
-    }
 
-    public function handle()
-    {
-        (new CreateAction($this->user, $this->entityManager))->handle();
+        $this->userStoreAction->setUser($this->user);
+        $this->userStoreAction->handle();
+        //TODO: implement AuthenticateAction
         // (new AuthenticateAction($this->entityManager, $this->user))->handle(); // SecurityAction
         $this->setSuccess(true);
         $this->setMessage('You have successfully registered');

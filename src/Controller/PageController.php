@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class PageController extends AbstractController
 {
     #[Route('/', name: 'app_main')]
-    public function index(): Response
+    public function main(): Response
     {
         return $this->render('page/main.html.twig');
     }
