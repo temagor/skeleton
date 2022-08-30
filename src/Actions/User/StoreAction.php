@@ -2,7 +2,6 @@
 
 namespace App\Actions\User;
 
-use App\Actions\AbstractAction;
 use App\Entity\User;
 use App\Exception\Validate\UserException;
 use Doctrine\ORM\EntityManagerInterface;

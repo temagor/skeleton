@@ -2,7 +2,6 @@
 
 namespace App\Actions\User;
 
-use App\Actions\AbstractAction;
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use App\Adapter\Request\RequestCredentialListAdapter;
@@ -11,6 +10,7 @@ use App\Entity\Credential;
 use App\Actions\User\StoreAction as UserStoreAction;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use App\Exception\Validate\UserException;
+use App\Actions\Security\AuthentificateAction as UserAuthentificateAction;
 
 class SignUpAction extends AbstractAction
 {
@@ -22,7 +22,8 @@ class SignUpAction extends AbstractAction
     function __construct(
         protected RequestUserAdapter $requestUserAdapter,
         protected RequestCredentialListAdapter $requestCredentialListAdapter,
-        protected UserStoreAction $userStoreAction
+        protected UserStoreAction $userStoreAction,
+        protected UserAuthentificateAction $authentificateAction
     ) {
         $this->user = $requestUserAdapter->getUser();
         if (!$requestCredentialListAdapter->hasUser()) {
@@ -44,9 +45,8 @@ class SignUpAction extends AbstractAction
 
         $this->userStoreAction->setUser($this->user);
         $this->userStoreAction->handle();
-        //TODO: implement AuthenticateAction
-        // (new AuthenticateAction($this->entityManager, $this->user))->handle(); // SecurityAction
-        $this->setSuccess(true);
+        $this->authentificateAction->setUser($this->user)->handle();
+        $this->setSuccess($this->authentificateAction->isSuccess());
         $this->setMessage('You have successfully registered');
     }
 }

@@ -6,7 +6,7 @@ use App\Exception\ValidateException;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Throwable;
 
-class UserException extends ValidateException
+final class UserException extends ValidateException
 {
     function __construct(protected ConstraintViolationListInterface $errors, int $code = 0, ?Throwable $previous = null)
     {

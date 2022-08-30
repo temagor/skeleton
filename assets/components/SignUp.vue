@@ -84,7 +84,7 @@ export default {
           this.message = response.data.message;
           if (response.data.success) {
             setTimeout(() => {
-              window.location.reload();
+              this.toggleVisible();
             }, 1500);
           }
         })

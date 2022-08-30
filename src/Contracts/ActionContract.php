@@ -7,5 +7,5 @@ interface ActionContract
     public function handle(): void;
     public function isSuccess(): bool;
     public function getMessage(): string;
-    public function getData(): mixed;
+    public function getData(): array;
 }
