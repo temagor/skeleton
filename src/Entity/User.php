@@ -12,11 +12,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Actions\User\StoreAction as UserStoreAction;
+use JsonSerializable;
 
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity('login')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -33,7 +34,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = [];
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Credential::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Credential::class, cascade: ['persist', 'remove'], orphanRemoval: true, fetch: "EAGER")]
     private Collection $credentials;
 
     public function __construct()
@@ -55,6 +56,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if (!$isCorrectMethodSaving) {
             throw new Exception("use " . UserStoreAction::class . ' to create user!');
         }
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'login' => $this->getLogin(),
+            'protected' => $this->isProtected(),
+            'roles' => $this->getRoles(),
+            'credentials' => $this->getCredentials()->toArray()
+        ];
     }
 
     public function getId(): ?int

@@ -17,6 +17,9 @@ security:
             lazy: true
             provider: app_user_provider
 
+            logout:
+                path: app:user:actions:api:sign-out
+
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 

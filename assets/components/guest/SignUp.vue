@@ -45,6 +45,9 @@
 </template>
 
 <script>
+import { mapState } from "pinia";
+import { mapActions } from "pinia";
+import { useUserStore } from "../../stores/user";
 import { Transition } from "vue";
 import axios from "axios";
 
@@ -69,6 +72,11 @@ export default {
       },
     };
   },
+  computed: {
+    // gives access to this.count inside the component
+    // same as reading from store.count
+    ...mapState(useUserStore, ["userData"]),
+  },
   methods: {
     toggleVisible() {
       this.isVisible = !this.isVisible;
@@ -83,6 +91,7 @@ export default {
           this.success = response.data.success;
           this.message = response.data.message;
           if (response.data.success) {
+            this.getUser();
             setTimeout(() => {
               this.toggleVisible();
             }, 1500);
@@ -113,9 +122,9 @@ export default {
             // Something happened in setting up the request that triggered an Error
             console.log("Error", error.message);
           }
-          console.log(error.config);
         });
     },
+    ...mapActions(useUserStore, ["getUser"]),
   },
 };
 </script>

@@ -9,14 +9,15 @@
 import './styles/app.scss';
 
 // start the Stimulus application
-import './bootstrap';
+// import './bootstrap';
 
+import { createPinia } from 'pinia';
+const pinia = createPinia();
 import { createApp } from 'vue';
-import SingIn from './components/signIn.vue';
-import SingUp from './components/signUp.vue';
+import ProfileScopeComponent from './components/ProfileScope.vue';
 
-const sign = createApp()
-sign
-    .component('signin', SingIn)
-    .component('signup', SingUp)
-    .mount('#sign')
+const profileScope = createApp()
+profileScope
+    .component('ProfileScope', ProfileScopeComponent)
+    .use(pinia)
+    .mount('#profileScope')

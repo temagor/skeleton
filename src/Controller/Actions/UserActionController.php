@@ -28,4 +28,10 @@ class UserActionController extends AbstractController
     {
         return new JsonResponse(['success' => true, 'message' => 'You have successfully logged in', 'data' => []]);
     }
+
+    #[Route('sign-out', name: 'sign-out', methods: ['POST'])]
+    public function signOut(): JsonResponse
+    {
+        return new JsonResponse(['success' => true, 'message' => 'You have successfully logged in', 'data' => []]);
+    }
 }
