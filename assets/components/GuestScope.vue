@@ -1,8 +1,6 @@
 <template>
-  <div>
-    <SignIn></SignIn>
-    <SignUp></SignUp>
-  </div>
+  <SignIn></SignIn>
+  <SignUp></SignUp>
 </template>
 
 <script>

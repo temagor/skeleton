@@ -1,29 +1,25 @@
 <template>
-  <button
-    class="button navigation__button button_signUp"
-    @click="toggleVisible"
-  >
+  <button class="button navigation__button button_signUp" @click="show">
     SignUp
   </button>
-  <div v-if="isVisible">
-    <div class="form form_popup">
-      <div
-        v-if="message"
-        class="form__message"
-        :class="{
-          form__message_success: success,
-          form__message_error: !success,
-        }"
-      >
-        {{ message }}
-      </div>
-      <form action="#" method="post" @submit.prevent="register">
+  <div v-if="isVisible" class="modal-wrapper" @click="hide">
+    <div
+      v-if="message"
+      class="form__message"
+      :class="{
+        form__message_success: success,
+        form__message_error: !success,
+      }"
+    >
+      {{ message }}
+    </div>
+    <div class="content" @click.stop="">
+      <div class="title">SignUp</div>
+      <form class="form" action="#" method="post" @submit.prevent="register">
         <div v-if="errors.login">{{ errors.login }}</div>
         <input v-model="user.login" type="text" placeholder="Enter login" />
-        <input v-model="user.protected" type="checkbox" id="switch" /><label
-          for="switch"
-          >Toggle</label
-        >
+        <input v-model="user.protected" type="checkbox" id="switch" />
+        <label for="switch">Toggle</label>
         <Transition name="slide-fade">
           <div v-if="user.protected">
             <input
@@ -48,11 +44,15 @@
 import { mapState } from "pinia";
 import { mapActions } from "pinia";
 import { useUserStore } from "../../stores/user";
+import clickOutSide from "@mahdikhashan/vue3-click-outside";
 import { Transition } from "vue";
 import axios from "axios";
 
 export default {
   components: { Transition },
+  directives: {
+    clickOutSide,
+  },
   data() {
     return {
       message: null,
@@ -80,6 +80,16 @@ export default {
   methods: {
     toggleVisible() {
       this.isVisible = !this.isVisible;
+    },
+    show() {
+      if (!this.isVisible) {
+        this.isVisible = true;
+      }
+    },
+    hide() {
+      if (this.isVisible) {
+        this.isVisible = false;
+      }
     },
     register() {
       axios
@@ -130,6 +140,10 @@ export default {
 </script>
 
 <style>
+.form_popup {
+  z-index: 100;
+  opacity: unset;
+}
 .slide-fade-enter-active {
   transition: all 0.3s ease-out;
 }

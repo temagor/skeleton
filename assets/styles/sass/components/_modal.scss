@@ -1,0 +1,30 @@
+.modal-wrapper {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 330px;
+    .title {
+      color: black;
+      background: #e9b73f;
+      width: -moz-available;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      text-align: center;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 auto;
+      font-weight: 700;
+    }
+  }
+}

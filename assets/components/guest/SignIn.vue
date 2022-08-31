@@ -1,13 +1,11 @@
 <template>
-  <button
-    class="button navigation__button button_signUp"
-    @click="toggleVisible"
-  >
+  <button class="button navigation__button button_signUp" @click="show">
     SignIn
   </button>
-  <div v-if="isVisible">
-    <div class="form form_popup">
-      <form action="/user/api/sign-in" method="post">
+  <div v-if="isVisible" class="modal-wrapper" @click="hide">
+    <div class="content" @click.stop="">
+      <div class="title">SignIn</div>
+      <form class="form" action="/user/api/sign-in" method="post">
         <input v-model="user.login" type="text" placeholder="Enter login" />
         <input
           v-model="user.password"
@@ -33,8 +31,15 @@ export default {
     };
   },
   methods: {
-    toggleVisible() {
-      this.isVisible = !this.isVisible;
+    show() {
+      if (!this.isVisible) {
+        this.isVisible = true;
+      }
+    },
+    hide() {
+      if (this.isVisible) {
+        this.isVisible = false;
+      }
     },
   },
 };
