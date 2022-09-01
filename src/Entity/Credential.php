@@ -9,8 +9,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: CredentialRepository::class)]
 class Credential
 {
-    protected array $fillable = ['type', 'value'];
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -20,7 +18,7 @@ class Credential
     #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     private ?User $user = null;
 
-    #[Assert\Choice(['login', 'email', 'phone'], message: 'not expected credential type')]
+    #[Assert\Choice(['password', 'email', 'phoneNumber'], message: 'not expected credential type')]
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 

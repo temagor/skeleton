@@ -32,6 +32,6 @@ class UserActionController extends AbstractController
     #[Route('sign-out', name: 'sign-out', methods: ['POST'])]
     public function signOut(): JsonResponse
     {
-        return new JsonResponse(['success' => true, 'message' => 'You have successfully logged in', 'data' => []]);
+        return new JsonResponse(['success' => true, 'message' => 'You have successfully logged out', 'data' => []]);
     }
 }

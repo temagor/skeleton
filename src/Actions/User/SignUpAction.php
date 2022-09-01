@@ -11,14 +11,25 @@ use App\Actions\User\StoreAction as UserStoreAction;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use App\Exception\Validate\UserException;
 use App\Actions\Security\AuthentificateAction as UserAuthentificateAction;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class SignUpAction extends AbstractAction
 {
     protected User $user;
     /** @var Credential[] $credentialList */
     protected array $credentialList;
-    protected Request $request;
 
+    /**
+     * @param RequestUserAdapter $requestUserAdapter 
+     * @param RequestCredentialListAdapter $requestCredentialListAdapter 
+     * @param StoreAction $userStoreAction 
+     * @param UserAuthentificateAction $authentificateAction 
+     * @return void 
+     * @throws BadRequestException 
+     */
     function __construct(
         protected RequestUserAdapter $requestUserAdapter,
         protected RequestCredentialListAdapter $requestCredentialListAdapter,
@@ -26,9 +37,7 @@ class SignUpAction extends AbstractAction
         protected UserAuthentificateAction $authentificateAction
     ) {
         $this->user = $requestUserAdapter->getUser();
-        if (!$requestCredentialListAdapter->hasUser()) {
-            $requestCredentialListAdapter->setUser($this->user);
-        }
+        $requestCredentialListAdapter->setUser($this->user);
         $this->credentialList = $requestCredentialListAdapter->getCredentialList();
     }
 
@@ -36,6 +45,9 @@ class SignUpAction extends AbstractAction
      * @return void 
      * @throws UserNotFoundException 
      * @throws UserException 
+     * @throws AuthenticationException 
+     * @throws NotFoundExceptionInterface 
+     * @throws ContainerExceptionInterface 
      */
     public function handle(): void
     {

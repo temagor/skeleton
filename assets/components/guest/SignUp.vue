@@ -16,14 +16,33 @@
     <div class="content" @click.stop="">
       <div class="title">SignUp</div>
       <form class="form" action="#" method="post" @submit.prevent="register">
+        <!-- login -->
         <div v-if="errors.login">{{ errors.login }}</div>
         <input v-model="user.login" type="text" placeholder="Enter login" />
-        <input v-model="user.protected" type="checkbox" id="switch" />
-        <label for="switch">Toggle</label>
+        <!-- email -->
+        <div v-if="errors.email">{{ errors.email }}</div>
+        <input
+          v-model="credentialList.email"
+          type="email"
+          placeholder="Enter email"
+        />
+        <!-- phoneNumber -->
+        <div v-if="errors.phoneNumber">{{ errors.phoneNumber }}</div>
+        <input
+          v-model="credentialList.phoneNumber"
+          type="tel"
+          placeholder="Enter phone"
+        />
+        <!-- protection -->
+        <div class="toggle">
+          <input v-model="user.protected" type="checkbox" id="switch" />
+          <label for="switch">Toggle</label>
+          <div>Password protection</div>
+        </div>
         <Transition name="slide-fade">
           <div v-if="user.protected">
             <input
-              v-model="credentialList.login.value"
+              v-model="credentialList.password"
               type="password"
               placeholder="Enter password"
             />
@@ -34,6 +53,7 @@
             />
           </div>
         </Transition>
+        <!-- submit -->
         <button type="submit">Register</button>
       </form>
     </div>
@@ -65,10 +85,9 @@ export default {
         protected: false,
       },
       credentialList: {
-        login: {
-          type: "login",
-          value: "!@ChangeMe!",
-        },
+        password: "!@ChangeMe!",
+        email: "",
+        phoneNumber: "",
       },
     };
   },

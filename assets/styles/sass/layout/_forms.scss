@@ -4,6 +4,8 @@
   background-color: #583145;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+  flex: 1 1 100%;
+  width: inherit;
   &__message {
     position: absolute;
     top: 10%;
@@ -36,6 +38,9 @@
     height: 0;
     width: 0;
     visibility: hidden;
+    &#switch {
+      position: absolute;
+    }
   }
 
   label {
@@ -113,6 +118,13 @@
     max-width: 350px;
     border-radius: 10px;
     background-color: #583145;
+  }
+
+  .toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
   }
 }
 

@@ -132,7 +132,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSer
     public function getPassword(): string
     {
         $loginCredential = $this->credentials->filter(function (Credential $credential) {
-            return $credential->getType() == 'login';
+            return $credential->getType() == 'password';
         })->first();
         if (!$loginCredential instanceof Credential) {
             throw new Exception('No password credentials');

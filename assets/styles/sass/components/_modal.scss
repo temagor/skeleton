@@ -11,11 +11,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-width: 330px;
+    width: 330px;
     .title {
       color: black;
       background: #e9b73f;
-      width: -moz-available;
+      width: inherit;
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
       text-align: center;

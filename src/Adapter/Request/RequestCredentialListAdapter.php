@@ -4,6 +4,8 @@ namespace App\Adapter\Request;
 
 use App\Entity\Credential;
 use App\Entity\User;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -14,6 +16,14 @@ class RequestCredentialListAdapter
 {
     protected ?User $user;
 
+    /**
+     * @param RequestStack $requestStack 
+     * @param UserPasswordHasherInterface $userPasswordHasher 
+     * @param Security $security 
+     * @return void 
+     * @throws NotFoundExceptionInterface 
+     * @throws ContainerExceptionInterface 
+     */
     function __construct(
         protected RequestStack $requestStack,
         protected UserPasswordHasherInterface $userPasswordHasher,
@@ -22,11 +32,16 @@ class RequestCredentialListAdapter
         $this->user = $security->getUser();
     }
 
+    /** @return bool  */
     public function hasUser(): bool
     {
         return ($this->user instanceof User);
     }
 
+    /**
+     * @param User $user 
+     * @return RequestCredentialListAdapter 
+     */
     public function setUser(User $user): self
     {
         $this->user = $user;
@@ -34,27 +49,23 @@ class RequestCredentialListAdapter
     }
 
     /**
-     * @return Credential[]
+     * @return array 
      * @throws BadRequestException 
-     * @throws UserNotFoundException 
      */
     public function getCredentialList(): array
     {
         $credentialList = $this->requestStack->getCurrentRequest()?->get('credentialList');
         $credentials = [];
-        foreach ($credentialList as $credentialFields) {
-            $credential = new Credential;
-            $credential->setType($credentialFields['type'] ?? null);
-            if ($credential->getType() === 'login') {
-                if (!$this->user instanceof User) {
-                    throw new UserNotFoundException();
-                }
-                if (!array_key_exists('value', $credentialFields)) {
-                    throw new BadRequestException('value not found');
-                }
-                $credential->setValue($this->userPasswordHasher->hashPassword($this->user, $credentialFields['value']));
+        foreach ($credentialList as $type => $value) {
+            if (!$value) {
+                continue;
             }
-            $credentials[] = $credential;
+            $credential = new Credential;
+            $credential->setType($type ?? null);
+            $credentials[] = match ($credential->getType()) {
+                'email', 'phoneNumber' => $credential->setValue($value),
+                'password' => $credential->setValue($this->userPasswordHasher->hashPassword($this->user, $value))
+            };
         }
 
         return $credentials;
