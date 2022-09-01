@@ -64,15 +64,11 @@
 import { mapState } from "pinia";
 import { mapActions } from "pinia";
 import { useUserStore } from "../../stores/user";
-import clickOutSide from "@mahdikhashan/vue3-click-outside";
 import { Transition } from "vue";
 import axios from "axios";
 
 export default {
   components: { Transition },
-  directives: {
-    clickOutSide,
-  },
   data() {
     return {
       message: null,

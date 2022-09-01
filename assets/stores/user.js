@@ -9,7 +9,6 @@ export const useUserStore = defineStore('user', {
         async getUser() {
             try {
                 const response = await axios.get('/security/actions/api/get-authentificated-user')
-                console.log(response);
                 if (response.data.success) {
                     this.user = response.data.data;
                 }
