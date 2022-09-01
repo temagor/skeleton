@@ -40,6 +40,14 @@
             placeholder="Enter phone number"
           />
         </Transition>
+        <Transition name="slide-fade">
+          <input
+            v-if="errors.password == 'show password input'"
+            v-model="credentialList.password"
+            type="password"
+            placeholder="Enter password"
+          />
+        </Transition>
         <button type="submit">Sign In</button>
       </form>
     </div>
@@ -67,7 +75,10 @@ export default {
         login: "",
         email: "",
         phoneNumber: "",
-        password: "!@ChangeMe!",
+        password: "",
+      },
+      optional: {
+        confirmationSms: 1234,
       },
       message: null,
       success: false,
@@ -124,7 +135,10 @@ export default {
     },
     signIn() {
       axios
-        .post("/user/actions/api/sign-in", this.credentialList)
+        .post("/user/actions/api/sign-in", {
+          credentialList: this.credentialList,
+          optional: this.optional,
+        })
         .then((response) => {
           this.success = response.data.success;
           this.message = response.data.message;
@@ -132,7 +146,7 @@ export default {
             this.getUser();
             setTimeout(() => {
               this.hide();
-            }, 1500);
+            }, 2000);
           }
         })
         .catch((error) => {
@@ -160,6 +174,12 @@ export default {
             // Something happened in setting up the request that triggered an Error
             console.log("Error", error.message);
           }
+        })
+        .then(() => {
+          // always executed
+          setTimeout(() => {
+            this.message = "";
+          }, 2000);
         });
     },
     ...mapActions(useUserStore, ["getUser"]),

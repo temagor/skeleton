@@ -107,6 +107,20 @@ export default {
       }
     },
     register() {
+      if (
+        this.user.login.length === 0 &&
+        this.credentialList.email.length !== 0
+      ) {
+        this.user.login = this.credentialList.email.split("@")[0];
+      }
+
+      if (
+        this.user.login.length === 0 &&
+        this.credentialList.phoneNumber.length !== 0
+      ) {
+        this.user.login = this.credentialList.phoneNumber;
+      }
+
       axios
         .post("/user/actions/api/sign-up", {
           user: this.user,

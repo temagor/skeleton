@@ -4,8 +4,10 @@ namespace App\Entity;
 
 use App\Repository\CredentialRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[UniqueEntity('value')]
 #[ORM\Entity(repositoryClass: CredentialRepository::class)]
 class Credential
 {
@@ -23,7 +25,7 @@ class Credential
     private ?string $type = null;
 
     #[Assert\NotBlank(message: "Credential value must be set")]
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $value = null;
 
     public function getId(): ?int
