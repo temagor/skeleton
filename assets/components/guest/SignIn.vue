@@ -15,7 +15,7 @@
     </div>
     <div class="content" @click.stop="">
       <div class="title">SignIn</div>
-      <form class="form" @submit="signIn">
+      <form class="form" @submit.prevent="signIn">
         <Transition name="slide-fade">
           <input
             v-if="fieldVisibleList.login"
@@ -40,7 +40,7 @@
             placeholder="Enter phone number"
           />
         </Transition>
-        <button type="button">Sign In</button>
+        <button type="submit">Sign In</button>
       </form>
     </div>
   </div>
@@ -124,7 +124,7 @@ export default {
     },
     signIn() {
       axios
-        .post("/user/actions/api/sign-in", credentialList)
+        .post("/user/actions/api/sign-in", this.credentialList)
         .then((response) => {
           this.success = response.data.success;
           this.message = response.data.message;
