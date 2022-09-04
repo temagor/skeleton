@@ -31,6 +31,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSer
     #[ORM\Column]
     private ?bool $protected = false;
 
+    #[Assert\NotBlank(message: "Password must be set")]
+    #[ORM\Column(length: 255)]
+    private ?string $password = '!@ChangeMe!';
+
     #[ORM\Column]
     private array $roles = [];
 
@@ -131,24 +135,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSer
      */
     public function getPassword(): string
     {
-        $loginCredential = $this->credentials->filter(function (Credential $credential) {
-            return $credential->getType() == 'password';
-        })->first();
-        if (!$loginCredential instanceof Credential) {
-            throw new Exception('No password credentials');
-        }
-        return $loginCredential->getValue();
+        return $this->password;
     }
 
     public function setPassword(string $password): self
     {
-        $loginCredential = $this->credentials->filter(function (Credential $credential) {
-            return $credential->getType() == 'login';
-        })->first();
-        if (!$loginCredential instanceof Credential) {
-            throw new Exception('No password credentials');
-        }
-        $loginCredential->setValue($password);
+        $this->password = $password;
         return $this;
     }
 

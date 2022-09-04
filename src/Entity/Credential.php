@@ -21,7 +21,7 @@ class Credential implements JsonSerializable
     #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     private ?User $user = null;
 
-    #[Assert\Choice(['password', 'email', 'phoneNumber'], message: 'not expected credential type')]
+    #[Assert\Choice(['email', 'phoneNumber'], message: 'not expected credential type')]
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 

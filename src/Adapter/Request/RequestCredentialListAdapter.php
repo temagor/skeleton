@@ -9,7 +9,6 @@ use Psr\Container\ContainerExceptionInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\Security;
 
 class RequestCredentialListAdapter
@@ -26,7 +25,6 @@ class RequestCredentialListAdapter
      */
     function __construct(
         protected RequestStack $requestStack,
-        protected UserPasswordHasherInterface $userPasswordHasher,
         protected Security $security
     ) {
         $this->user = $security->getUser();
@@ -56,16 +54,13 @@ class RequestCredentialListAdapter
     {
         $credentialList = $this->requestStack->getCurrentRequest()?->get('credentialList');
         $credentials = [];
-        foreach ($credentialList as $type => $value) {
-            if (!$value) {
+        foreach ($credentialList as $credentialType => $credentialValue) {
+            if (empty($credentialValue)) {
                 continue;
             }
             $credential = new Credential;
-            $credential->setType($type ?? null);
-            $credentials[] = match ($credential->getType()) {
-                'email', 'phoneNumber' => $credential->setValue($value),
-                'password' => $credential->setValue($this->userPasswordHasher->hashPassword($this->user, $value))
-            };
+            $credential->setType($credentialType);
+            $credentials[] =  $credential->setValue($credentialValue);
         }
 
         return $credentials;

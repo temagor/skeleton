@@ -42,7 +42,7 @@
         <Transition name="slide-fade">
           <div v-if="user.protected">
             <input
-              v-model="credentialList.password"
+              v-model="user.password"
               type="password"
               placeholder="Enter password"
             />
@@ -75,13 +75,13 @@ export default {
       success: false,
       errors: {},
       isVisible: false,
-      confirmPassword: "!@ChangeMe!",
+      confirmPassword: "",
       user: {
         login: "",
         protected: false,
+        password: "",
       },
       credentialList: {
-        password: "!@ChangeMe!",
         email: "",
         phoneNumber: "",
       },
