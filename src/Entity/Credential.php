@@ -4,12 +4,13 @@ namespace App\Entity;
 
 use App\Repository\CredentialRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[UniqueEntity('value')]
 #[ORM\Entity(repositoryClass: CredentialRepository::class)]
-class Credential
+class Credential implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -27,6 +28,14 @@ class Credential
     #[Assert\NotBlank(message: "Credential value must be set")]
     #[ORM\Column(length: 255, unique: true)]
     private ?string $value = null;
+
+    public function jsonSerialize(): mixed
+    {
+        return [
+            'type' => $this->getType(),
+            'value' => $this->getValue(),
+        ];
+    }
 
     public function getId(): ?int
     {
