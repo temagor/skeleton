@@ -15,9 +15,16 @@ import { createPinia } from 'pinia';
 const pinia = createPinia();
 import { createApp } from 'vue';
 import ProfileScopeComponent from './components/ProfileScope.vue';
+import CheckStateComponent from './components/CheckStateComponent.vue';
 
 const profileScope = createApp()
 profileScope
     .component('ProfileScope', ProfileScopeComponent)
     .use(pinia)
     .mount('#profileScope')
+
+const checkState = createApp()
+checkState
+    .component('CheckState', CheckStateComponent)
+    .use(pinia)
+    .mount('#checkState')

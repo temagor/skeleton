@@ -41,6 +41,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSer
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Credential::class, cascade: ['persist', 'remove'], orphanRemoval: true, fetch: "EAGER")]
     private Collection $credentials;
 
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Profile $profile = null;
+
     public function __construct()
     {
         $this->credentials = new ArrayCollection();
@@ -68,7 +71,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSer
             'login' => $this->getLogin(),
             'protected' => $this->isProtected(),
             'roles' => $this->getRoles(),
-            'credentials' => $this->getCredentials()->toArray()
+            'credentials' => $this->getCredentials()->toArray(),
+            'profile' => $this->getProfile()
         ];
     }
 
@@ -179,6 +183,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, JsonSer
                 $credential->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProfile(): ?Profile
+    {
+        if (!$this->profile) {
+            return new Profile;
+        }
+        return $this->profile;
+    }
+
+    public function setProfile(Profile $profile): self
+    {
+        // set the owning side of the relation if necessary
+        if ($profile->getUser() !== $this) {
+            $profile->setUser($this);
+        }
+
+        $this->profile = $profile;
 
         return $this;
     }
